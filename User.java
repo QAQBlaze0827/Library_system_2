@@ -6,7 +6,7 @@ class User {
     private final String upassword;
 
     // 建構子:自動生成 UID
-    public User(int uid, String uname, String upassword) {
+    public User( String uname, String upassword) {
         this.uid = nextUid.getAndIncrement(); // 自動生成 UID 並遞增
         this.uname = uname;
         this.upassword = upassword;

@@ -15,7 +15,7 @@ public class addUser {
 
         // 新增用戶資料
         List<User> allUsers = new ArrayList<>();
-        allUsers.add(new User(2, username, password));
+        allUsers.add(new User(username, password));
 
         // 檢查檔案是否已存在
         boolean fileExists = new File(path).exists();
