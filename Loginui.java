@@ -1,6 +1,11 @@
 import java.awt.Container;
 import java.awt.event.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.*;
 import javax.swing.*;
+
 public class Loginui extends JFrame {
     private final JPanel panel = new JPanel();
     private Container cp;
@@ -51,19 +56,32 @@ public class Loginui extends JFrame {
         panel.add(registerButton);
 
         // Admin 帳號驗證
-        Admin admin = new Admin();
-        String path="user.csv";
-        //顯示目前清單
+        String path = "user.csv";
+        
+        // 登入邏輯
         loginButton.addActionListener((ActionEvent e) -> {
-            
             String username = userText.getText();
-            String password = new String(passwordText.getPassword()); // 將 char[] 轉為 String
-            if (admin.getAdminUser().equals(username) && admin.getAdminPassword().equals(password)) {
-                this.setVisible(false);
-                MainSystemui mainSystemui = new MainSystemui();
-                mainSystemui.setVisible(true);
-                System.out.println("Login Success");
-            } else {
+            String password = new String(passwordText.getPassword());
+
+            List<User> allUsers = loadUserFromCsv(path);
+            boolean isAuthenticated = false;
+
+            for (User user : allUsers) {
+                if (user.getUname().equals(username) && user.getUpassword().equals(password)) {
+                    isAuthenticated = true;
+                    if (user.getUid() == 0) {
+                        System.out.println("這是管理員");
+                    } else {
+                        System.out.println("這是一班使用者");
+                    }
+                    this.setVisible(false);
+                    MainSystemui mainSystemui = new MainSystemui();
+                    mainSystemui.setVisible(true);
+                    break;
+                }
+            }
+
+            if (!isAuthenticated) {
                 System.out.println("Login Fail");
                 userText.setText("");
                 passwordText.setText("");
@@ -73,6 +91,24 @@ public class Loginui extends JFrame {
             Registerui registerui = new Registerui();
             registerui.setVisible(true);
         });
+    }
+    // 從 CSV 文件載入使用者
+    private List<User> loadUserFromCsv(String path) {
+        List<User> allUsers = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+            String line;
+            boolean isFirstLine = true; // 跳過標題行
+            while ((line = br.readLine()) != null) {
+                if (isFirstLine) {
+                    isFirstLine = false;
+                    continue;
+                }
+                allUsers.add(User.fromCsvRow(line));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return allUsers;
     }
     public static void main(String[] args) {
         new Loginui().setVisible(true);
