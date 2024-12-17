@@ -7,9 +7,9 @@ public class RemoveUser{
         String path="user.csv";
         List<User> LoadAllUsers=loadUserFromCsv(path);
         //顯示目前清單
-        System.out.println("目前書本清單");
+        System.out.println("目前用戶清單");
         for(User user:LoadAllUsers){
-            System.out.println(user.getUid()+","+user.getUname()+","+user.getUpassword());
+            System.out.println(user.getUid()+","+user.getUname()+","+user.getUpassword()+","+user.getBorrowedBooks());
 
         }
         int uidToDelete=2; //要刪除的資料
@@ -52,7 +52,7 @@ public class RemoveUser{
     //儲存刪除後的資料
     public static void saveUserToCsv(List<User> allUsers,String path){
         try(BufferedWriter bw=new BufferedWriter(new FileWriter(path))){
-            bw.write("ID,Uname,upassword");
+            bw.write("ID,Uname,upassword,borrowedBooks");
             bw.newLine();
             for(User user:allUsers){
                 bw.write(user.toCsvRow());

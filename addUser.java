@@ -23,7 +23,7 @@ public class addUser {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(path, true))) {
             // 如果檔案不存在或為空，寫入標題
             if (!fileExists || isFileEmpty(path)) {
-                bw.write("ID,Name,Password");
+                bw.write("ID,Name,Password,borrowedBooks");
                 bw.newLine();
             }
 
