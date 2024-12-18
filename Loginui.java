@@ -71,13 +71,18 @@ public class Loginui extends JFrame {
                     isAuthenticated = true;
                     if (user.getUid() == 0) {
                         System.out.println("這是管理員");
+                        MainSystemuiAdmin mainSystemuiAdmin = new MainSystemuiAdmin();
+                        mainSystemuiAdmin.setVisible(true);
+                        this.setVisible(false);
+                        break;
                     } else {
                         System.out.println("這是一班使用者");
+                        MainSystemuiUser mainSystemuiUser = new MainSystemuiUser();
+                        mainSystemuiUser.setVisible(true);
+                        this.setVisible(false);
+                        break;
                     }
-                    this.setVisible(false);
-                    MainSystemui mainSystemui = new MainSystemui();
-                    mainSystemui.setVisible(true);
-                    break;
+                    
                 }
             }
 

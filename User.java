@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 class User {
-    private static final AtomicInteger nextUid = new AtomicInteger(1); // 靜態變數，負責自動生成 UID
+    private static final AtomicInteger nextUid = new AtomicInteger(0); // 靜態變數，負責自動生成 UID
     private final int uid; //final 修飾符，表示該變數只能在建構子中賦值，之後不能修改
     private final String uname;
     private final String upassword;
@@ -28,6 +28,10 @@ class User {
     private static void updateNextUid(int uid) {
         nextUid.set(Math.max(uid + 1, nextUid.get()));
     }
+    public static void setNextUid(int nextUidValue) {
+        nextUid.set(nextUidValue);
+    }
+    
     public int getUid(){
         return uid;
     }
@@ -75,7 +79,13 @@ class User {
     }
     //解析 CSV 文件中的行
     public static User fromCsvRow(String csvRow){
+        if(csvRow == null || csvRow.isEmpty()){
+            return null;
+        }
         String[] parts=csvRow.split(",");
+        if(parts.length < 3){
+            return null;
+        }
         int uid=Integer.parseInt(parts[0]);
         String uname=parts[1];
         String upassword=parts[2];

@@ -2,16 +2,15 @@ import java.awt.*;
 import javax.swing.*;
 
 
-public class MainSystemui extends JFrame {
+public class MainSystemuiAdmin extends JFrame {
     private Container cp;
     private CardLayout cardLayout;
     private final JPanel userPanel= new JPanel();
     private final JPanel functionPanel = new JPanel();
     private JPanel contentPanel;
-    private Library library = new Library(); // 建立 Library 物件 用來借書還書新增書籍
 
 
-    public MainSystemui() {
+    public MainSystemuiAdmin() {
         init();
     }
 
@@ -221,6 +220,6 @@ public class MainSystemui extends JFrame {
         this.setResizable(true); // 確保視窗大小可以調整
     }
     public static void main(String[] args) {
-        new MainSystemui().setVisible(true);
+        new MainSystemuiAdmin().setVisible(true);
     }
 }
