@@ -42,14 +42,28 @@ public class Book {
     public void setBorrowedByUid(Integer borrowedByUid){
         this.borrowedByUid = borrowedByUid;
     }
-    public void borrowBook(){
+    public void borrowBook(int userid){
         if(!isBorrowed){
             this.isBorrowed = true;
+            this.borrowedByUid=userid;
+            System.out.println("Book is borrowed successfully");
+
         }
         else{
             System.out.println("Book is already borrowed");
         }
         // this.isBorrowed = true;
+    }
+    public void returnBook(){
+        if(isBorrowed){
+            this.isBorrowed = false;
+            this.borrowedByUid = null;
+            System.out.println("Book is returned successfully");
+        }
+        else{
+            System.out.println("Book is not borrowed");
+        }
+        // this.isBorrowed = false;
     }
     //新增資料進檔案(改格式)
     public String toCsvRow(){

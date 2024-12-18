@@ -180,7 +180,7 @@ public class MainSystemui extends JFrame {
                 int book_ID = Integer.parseInt(bookIDText.getText());
         
                 // 呼叫 Library 的 addBook 方法
-                library.addBook(bookName, book_ID);
+                // library.addBook(bookName, book_ID);
                 System.out.println("Book added: Name = " + bookName + ", ID = " + book_ID);
         
                 // 清空輸入框
@@ -196,7 +196,7 @@ public class MainSystemui extends JFrame {
                 int book_ID = Integer.parseInt(deleteBookIDText.getText());
         
                 // 呼叫 Library 的 deleteBook 方法
-                library.deleteBook(book_ID);
+                // library.deleteBook(book_ID);
         
                 // 清空輸入框
                 deleteBookIDText.setText("");
@@ -209,7 +209,7 @@ public class MainSystemui extends JFrame {
                 // int book_ID = Integer.parseInt(searchBookIDText.getText());
         
                 // 呼叫 Library 的 deleteBook 方法
-                library.displayBooks();
+                // library.displayBooks();
         
                 // 清空輸入框
                 searchBookIDText.setText("");
