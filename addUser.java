@@ -38,7 +38,7 @@ public class addUser {
                 bw.newLine();
             }
 
-            System.out.println("寫入成功！");
+            System.out.println("寫入成功！ 之後記得要把她註解掉");
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -70,13 +70,13 @@ public class Loginui extends JFrame {
                 if (user.getUname().equals(username) && user.getUpassword().equals(password)) {
                     isAuthenticated = true;
                     if (user.getUid() == 0) {
-                        System.out.println("這是管理員");
+                        // System.out.println("這是管理員");
                         MainSystemuiAdmin mainSystemuiAdmin = new MainSystemuiAdmin();
                         mainSystemuiAdmin.setVisible(true);
                         this.setVisible(false);
                         break;
                     } else {
-                        System.out.println("這是一班使用者");
+                        // System.out.println("這是一班使用者");
                         MainSystemuiUser mainSystemuiUser = new MainSystemuiUser();
                         mainSystemuiUser.setVisible(true);
                         this.setVisible(false);
@@ -118,4 +118,4 @@ public class Loginui extends JFrame {
     public static void main(String[] args) {
         new Loginui().setVisible(true);
     }
-} //有人在搞
+}

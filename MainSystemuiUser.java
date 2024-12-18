@@ -36,8 +36,7 @@ public class MainSystemuiUser extends JFrame {
         userPanel.add(label);
 
         //-----------------功能 panel
-        //這邊應該可以在優化
-
+        //這邊應該可以在優化一下
         functionPanel.setBounds(0, 0, 200, 700);
         functionPanel.setBackground(Color.lightGray);
         functionPanel.setLayout(null);
@@ -62,6 +61,12 @@ public class MainSystemuiUser extends JFrame {
         borrowRecordButton.setBounds(0, 200, 200, 50);
         borrowRecordButton.setAlignmentX(LEFT_ALIGNMENT); 
         functionPanel.add(borrowRecordButton);
+        //功能panel 登出
+        JButton logoutButton = new JButton("Log out");
+        logoutButton.setBackground(Color.red);
+        logoutButton.setBounds(0, 600, 200, 70); 
+        logoutButton.setAlignmentX(LEFT_ALIGNMENT);
+        functionPanel.add(logoutButton);
         //-----------------功能 panel end
 
         //------------------右邊的panel
@@ -93,6 +98,7 @@ public class MainSystemuiUser extends JFrame {
         searchBook.setBounds(10, 80, 200, 25);
         searchBook.setAlignmentX(LEFT_ALIGNMENT);
         searchBookPanel.add(searchBook);
+        
         //查詢書籍的panel中的元件 end
         //------------------
 

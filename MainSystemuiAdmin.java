@@ -57,21 +57,27 @@ public class MainSystemuiAdmin extends JFrame {
         searchBookButton.setBounds(0, 100, 200, 50); 
         searchBookButton.setAlignmentX(LEFT_ALIGNMENT);
         functionPanel.add(searchBookButton);
-        //功能panel 中的借閱書籍(僅讀者可使用)
-        JButton borrowBookButton = new JButton("Borrow Book"); 
-        borrowBookButton.setBounds(0, 150, 200, 50); 
-        borrowBookButton.setAlignmentX(LEFT_ALIGNMENT); 
-        functionPanel.add(borrowBookButton); 
-        //功能panel 中的還書(僅讀者可使用)
-        JButton returnBookButton = new JButton("Return Book");
-        returnBookButton.setBounds(0, 200, 200, 50);
-        returnBookButton.setAlignmentX(LEFT_ALIGNMENT);
-        functionPanel.add(returnBookButton); 
-        //功能panel 中的讀者借書紀錄(僅讀者可使用)
-        JButton borrowRecordButton = new JButton("Borrow Record"); 
-        borrowRecordButton.setBounds(0, 250, 200, 50);
-        borrowRecordButton.setAlignmentX(LEFT_ALIGNMENT); 
-        functionPanel.add(borrowRecordButton);
+        //功能panel 中的登出
+        JButton logoutButton = new JButton("Log out");
+        logoutButton.setBackground(Color.red);
+        logoutButton.setBounds(0, 600, 200, 70); 
+        logoutButton.setAlignmentX(LEFT_ALIGNMENT);
+        functionPanel.add(logoutButton);
+        // //功能panel 中的借閱書籍(僅讀者可使用)
+        // JButton borrowBookButton = new JButton("Borrow Book"); 
+        // borrowBookButton.setBounds(0, 150, 200, 50); 
+        // borrowBookButton.setAlignmentX(LEFT_ALIGNMENT); 
+        // functionPanel.add(borrowBookButton); 
+        // //功能panel 中的還書(僅讀者可使用)
+        // JButton returnBookButton = new JButton("Return Book");
+        // returnBookButton.setBounds(0, 200, 200, 50);
+        // returnBookButton.setAlignmentX(LEFT_ALIGNMENT);
+        // functionPanel.add(returnBookButton); 
+        // //功能panel 中的讀者借書紀錄(僅讀者可使用)
+        // JButton borrowRecordButton = new JButton("Borrow Record"); 
+        // borrowRecordButton.setBounds(0, 250, 200, 50);
+        // borrowRecordButton.setAlignmentX(LEFT_ALIGNMENT); 
+        // functionPanel.add(borrowRecordButton);
         //-----------------功能 panel end
 
         //------------------右邊的panel
@@ -162,6 +168,7 @@ public class MainSystemuiAdmin extends JFrame {
         searchBook.setAlignmentX(LEFT_ALIGNMENT);
         searchBookPanel.add(searchBook);
         //查詢書籍的panel中的元件 end
+
         //------------------
 
         //------------------右邊的panel end
@@ -171,15 +178,42 @@ public class MainSystemuiAdmin extends JFrame {
         addBookButton.addActionListener((e) -> cardLayout.show(contentPanel, "AddBook"));
         deleteBookButton.addActionListener((e) -> {cardLayout.show(contentPanel, "DeleteBook");});
         searchBookButton.addActionListener((e) -> {cardLayout.show(contentPanel, "SearchBook");});
+        logoutButton.addActionListener((e) -> {
+            // 顯示確認對話框
+            int result = JOptionPane.showConfirmDialog(
+                null, 
+                "Are you sure you want to log out?", 
+                "Logout Confirmation", 
+                JOptionPane.YES_NO_OPTION
+            );
+        
+            // 檢查使用者的選擇
+            if (result == JOptionPane.YES_OPTION) {
+                // 如果使用者按下 "Yes"，執行登出操作
+                JOptionPane.showMessageDialog(null, "You have logged out successfully.");
+                 // 創建並顯示 LoginUI 界面
+                new Loginui().setVisible(true);
+                // 關閉當前視窗
+                ((JFrame) SwingUtilities.getWindowAncestor(logoutButton)).dispose();
+            } else {
+                // // 如果使用者按下 "No"，不執行任何操作
+                // System.out.println("Logout cancelled.");
+            }
+        });
         //監控 控制右邊panel 的按鈕 end
         //監控新增的按鈕
         addBook.addActionListener((e) -> {
             try {
                 String bookName = bookNameText.getText();
                 int book_ID = Integer.parseInt(bookIDText.getText());
-        
-                // 呼叫 Library 的 addBook 方法
-                // library.addBook(bookName, book_ID);
+                //這邊我覺得怪怪的
+                AddBook addBookInstance = new AddBook();
+                addBookInstance.addBooktolist(bookName, book_ID, false);
+                //到這邊
+                //底下我也覺得怪怪的
+                // Book newBook = new Book(bookName, book_ID, false);
+                // Library.addBook(newBook);
+                //到這邊
                 System.out.println("Book added: Name = " + bookName + ", ID = " + book_ID);
         
                 // 清空輸入框
@@ -217,7 +251,7 @@ public class MainSystemuiAdmin extends JFrame {
             }
         });
         //底下這不知道幹嘛的
-        this.setResizable(true); // 確保視窗大小可以調整
+        this.setResizable(false); // 確保視窗大小可以調整
     }
     public static void main(String[] args) {
         new MainSystemuiAdmin().setVisible(true);
