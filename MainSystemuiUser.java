@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 
 public class MainSystemuiUser extends JFrame {
@@ -133,13 +134,73 @@ public class MainSystemuiUser extends JFrame {
         borrowBookPanel.add(borrowBook);
         //借閱書籍的panel中的元件 end
         //------------------
+        //還書的panel
+        JPanel returnBookPanel = new JPanel();
+        returnBookPanel.setBounds(200, 0, 800, 750);
+        returnBookPanel.setBackground(Color.white);
+        cp.add(returnBookPanel);
+        returnBookPanel.setLayout(null);
+        returnBookPanel.setVisible(false); // 一開始不顯示
+        contentPanel.add(returnBookPanel, "ReturnBook");
+        //還書的panel中的元件
+        JLabel returnTitle = new JLabel("Return Book System");
+        returnTitle.setBounds(10, 10, 200, 25);
+        returnTitle.setAlignmentX(CENTER_ALIGNMENT);
+        returnBookPanel.add(returnTitle);
+        JLabel returnBookID = new JLabel("Book ID");
+        returnBookID.setBounds(10, 50, 80, 25);
+        returnBookPanel.add(returnBookID);
+        JTextField returnBookIDText = new JTextField(20);
+        returnBookIDText.setBounds(100, 50, 200, 25);
+        returnBookPanel.add(returnBookIDText);
+        JButton returnBook = new JButton("Return Book");
+        returnBook.setBounds(10, 80, 200, 25);
+        returnBook.setAlignmentX(LEFT_ALIGNMENT);
+        returnBookPanel.add(returnBook);
+        // 創建表格模型
+        // 创建表格数据模型
+        String[] columnNames = {"Book ID", "Book Name", "Is Borrowed"};
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+        // 创建表格并添加到滚动面板
+        JTable bookTable = new JTable(tableModel);
+        JScrollPane scrollPane = new JScrollPane(bookTable);
+        returnBookPanel.add(scrollPane, BorderLayout.CENTER);
+        scrollPane.setBounds(10, 120, 780, 500);
+        // 加载书籍数据并填充表格
+        //這邊我設想是 只顯示使用者借的書 畢竟是要還書 不可能還自己沒借的書
+        try {
+            String path = "allBook.csv";
+            List<Book> allBooks = loadBooksFromFile(path);
+            for (Book book : allBooks) {
+                tableModel.addRow(new Object[]{
+                    book.getBookID(),
+                    book.getBookName(),
+                    book.getIsBorrowed() ? "Yes" : "No"
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
+        // 添加底部交互部分
+        // JPanel bottomPanel = new JPanel(new FlowLayout());
+        // returnBookPanel.add(bottomPanel, BorderLayout.SOUTH);
+
+        // JLabel returnBookID = new JLabel("Book ID:");
+        // JTextField returnBookIDText = new JTextField(10);
+        // JButton returnBookButton = new JButton("Return Book");
+
+        // bottomPanel.add(returnBookID);
+        // bottomPanel.add(returnBookIDText);
+        // bottomPanel.add(returnBookButton);
+        //還書的panel中的元件 end
         //------------------右邊的panel end
 
         
         //監控 控制右邊panel 的按鈕
         searchBookButton.addActionListener((e) -> {cardLayout.show(contentPanel, "SearchBook");});
         borrowBookButton.addActionListener((e) -> {cardLayout.show(contentPanel, "BorrowBook");});
+        returnBookButton.addActionListener((e) -> {cardLayout.show(contentPanel, "ReturnBook");});
         logoutButton.addActionListener((e) -> {
             // 顯示確認對話框
             int result = JOptionPane.showConfirmDialog(
@@ -169,6 +230,7 @@ public class MainSystemuiUser extends JFrame {
                 //底下是測試用的
                 searchBookIDText.setText("");
                 String path = "allBook.csv";
+                
                 List<Book> loadAllBooks = loadBooksFromFile(path);
                 for (Book book : loadAllBooks) {
                     System.out.println(book.getBookName() + "," + book.getBookID() + "," + book.getIsBorrowed());
@@ -179,12 +241,6 @@ public class MainSystemuiUser extends JFrame {
         });
         borrowBook.addActionListener((e) ->{
             try {
-                // int book_ID = Integer.parseInt(borrowBookIDText.getText());
-        
-                // 呼叫 Library 的 deleteBook 方法
-                // library.displayBooks();
-        
-                // 清空輸入框
                 borrowBookIDText.setText("");
             } catch (NumberFormatException ex) {
                 System.out.println("Invalid Book ID. Please enter a numeric value.");
