@@ -100,6 +100,30 @@ public class MainSystemuiUser extends JFrame {
         searchBookPanel.add(searchBook);
         
         //查詢書籍的panel中的元件 end
+        //借閱書籍的panel
+        JPanel borrowBookPanel = new JPanel();
+        borrowBookPanel.setBounds(200, 0, 800, 750);
+        borrowBookPanel.setBackground(Color.white);
+        cp.add(borrowBookPanel);
+        borrowBookPanel.setLayout(null);
+        borrowBookPanel.setVisible(false); // 一開始不顯示
+        contentPanel.add(borrowBookPanel, "BorrowBook");
+        //借閱書籍的panel中的元件
+        JLabel borrowTitle = new JLabel("Borrow Book System");
+        borrowTitle.setBounds(10, 10, 200, 25);
+        borrowTitle.setAlignmentX(CENTER_ALIGNMENT);
+        borrowBookPanel.add(borrowTitle);
+        JLabel borrowBookID = new JLabel("Book ID");
+        borrowBookID.setBounds(10, 50, 80, 25);
+        borrowBookPanel.add(borrowBookID);
+        JTextField borrowBookIDText = new JTextField(20);
+        borrowBookIDText.setBounds(100, 50, 200, 25);
+        borrowBookPanel.add(borrowBookIDText);
+        JButton borrowBook = new JButton("Borrow Book");
+        borrowBook.setBounds(10, 80, 200, 25);
+        borrowBook.setAlignmentX(LEFT_ALIGNMENT);
+        borrowBookPanel.add(borrowBook);
+        //借閱書籍的panel中的元件 end
         //------------------
 
         //------------------右邊的panel end
@@ -107,6 +131,7 @@ public class MainSystemuiUser extends JFrame {
         
         //監控 控制右邊panel 的按鈕
         searchBookButton.addActionListener((e) -> {cardLayout.show(contentPanel, "SearchBook");});
+        borrowBookButton.addActionListener((e) -> {cardLayout.show(contentPanel, "BorrowBook");});
         //監控 控制右邊panel 的按鈕 end
         //監控新增的按鈕
         searchBook.addActionListener((e) ->{
@@ -118,6 +143,19 @@ public class MainSystemuiUser extends JFrame {
         
                 // 清空輸入框
                 searchBookIDText.setText("");
+            } catch (NumberFormatException ex) {
+                System.out.println("Invalid Book ID. Please enter a numeric value.");
+            }
+        });
+        borrowBook.addActionListener((e) ->{
+            try {
+                // int book_ID = Integer.parseInt(borrowBookIDText.getText());
+        
+                // 呼叫 Library 的 deleteBook 方法
+                // library.displayBooks();
+        
+                // 清空輸入框
+                borrowBookIDText.setText("");
             } catch (NumberFormatException ex) {
                 System.out.println("Invalid Book ID. Please enter a numeric value.");
             }

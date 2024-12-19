@@ -1,3 +1,2 @@
-BookName,BookId,IsBorrowed,BorrowedByUid
+BookName,BookId,IsBorrowed
 test,456,false,
-test2,78,false,

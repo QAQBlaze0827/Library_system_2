@@ -227,7 +227,8 @@ public class MainSystemuiAdmin extends JFrame {
         deleteBook.addActionListener((e) -> {
             try {
                 int book_ID = Integer.parseInt(deleteBookIDText.getText());
-        
+                RemoveBook removebook = new RemoveBook();
+                removebook.removefromlist(book_ID);
                 // 呼叫 Library 的 deleteBook 方法
                 // library.deleteBook(book_ID);
         
