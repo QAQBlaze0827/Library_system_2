@@ -208,7 +208,7 @@ public class MainSystemuiAdmin extends JFrame {
                 int book_ID = Integer.parseInt(bookIDText.getText());
                 //這邊我覺得怪怪的
                 AddBook addBookInstance = new AddBook();
-                addBookInstance.addBooktolist(bookName, book_ID, false);
+                addBookInstance.addBookToList(bookName, book_ID, false);
                 //到這邊
                 //底下我也覺得怪怪的
                 // Book newBook = new Book(bookName, book_ID, false);

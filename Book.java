@@ -47,10 +47,11 @@ public class Book {
             this.isBorrowed = true;
             this.borrowedByUid=userid;
             System.out.println("Book is borrowed successfully");
-
+           
         }
         else{
             System.out.println("Book is already borrowed");
+            
         }
         // this.isBorrowed = true;
     }
@@ -72,17 +73,31 @@ public class Book {
 
     }
     //解析 CSV 文件中的行
-    public static Book fromCsvRow(String csvRow){
-        String[] parts=csvRow.split(",");
-        String bookName=parts[0];
-        int bookID=Integer.parseInt(parts[1]);
-        boolean isBorrowed=Boolean.parseBoolean(parts[2]);
-        Integer borrowedByUid=parts.length>3 && !parts[3].isEmpty()?Integer.parseInt(parts[3]):null;
-        // return new Book(bookName, bookID, isBorrowed); // 修正後
-        Book book = new Book(bookName, bookID,isBorrowed);
-        // book.setBorrowed(isBorrowed);
-        book.setBorrowedByUid(borrowedByUid);
-        return book;
-
+    public static Book fromCsvRow(String csvRow) {
+        if (csvRow == null || csvRow.trim().isEmpty()) {
+            System.err.println("跳過空行");
+            return null; // 空行直接跳過
+        }
+    
+        String[] parts = csvRow.split(",");
+        if (parts.length < 3) { // 檢查是否有至少 3 個欄位
+            System.err.println("行格式錯誤，跳過：" + csvRow);
+            return null;
+        }
+    
+        try {
+            String bookName = parts[0];
+            int bookID = Integer.parseInt(parts[1]);
+            boolean isBorrowed = Boolean.parseBoolean(parts[2]);
+            Integer borrowedByUid = (parts.length > 3 && !parts[3].isEmpty()) ? Integer.parseInt(parts[3]) : null;
+    
+            Book book = new Book(bookName, bookID, isBorrowed);
+            book.setBorrowedByUid(borrowedByUid);
+            return book;
+        } catch (NumberFormatException e) {
+            System.err.println("行資料解析錯誤，跳過：" + csvRow);
+            return null; // 資料解析失敗時跳過該行
+        }
     }
+    
 }
