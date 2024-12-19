@@ -28,10 +28,10 @@ public class Loginui extends JFrame {
         // 主面板區域
         panel.setBounds(20, 20, 400, 200);
         panel.setLayout(null);
-        // panel.setBackground(new java.awt.Color(161, 196, 253));
         cp.add(panel);
+
         // 添加元件
-        JLabel userLabel = new JLabel("User:"); 
+        JLabel userLabel = new JLabel("User:");
         userLabel.setBounds(10, 50, 80, 25);
         panel.add(userLabel);
 
@@ -55,48 +55,57 @@ public class Loginui extends JFrame {
         registerButton.setBounds(200, 120, 80, 25);
         panel.add(registerButton);
 
-        // Admin 帳號驗證
+        // CSV 路徑
+       
         String path = "user.csv";
-        
+
         // 登入邏輯
         loginButton.addActionListener((ActionEvent e) -> {
             String username = userText.getText();
             String password = new String(passwordText.getPassword());
 
+            // 從 CSV 載入所有使用者
             List<User> allUsers = loadUserFromCsv(path);
-            boolean isAuthenticated = false;
 
-            for (User user : allUsers) {
-                if (user.getUname().equals(username) && user.getUpassword().equals(password)) {
-                    isAuthenticated = true;
-                    if (user.getUid() == 0) {
-                        // System.out.println("這是管理員");
-                        MainSystemuiAdmin mainSystemuiAdmin = new MainSystemuiAdmin();
-                        mainSystemuiAdmin.setVisible(true);
-                        this.setVisible(false);
-                        break;
-                    } else {
-                        // System.out.println("這是一班使用者");
-                        MainSystemuiUser mainSystemuiUser = new MainSystemuiUser();
-                        mainSystemuiUser.setVisible(true);
-                        this.setVisible(false);
-                        break;
-                    }
-                    
+            // 查找匹配的使用者
+            User authenticatedUser = allUsers.stream()
+                .filter(user -> user.getUname().equals(username) && user.getUpassword().equals(password))
+                .findFirst()
+                .orElse(null);
+
+            if (authenticatedUser != null) {
+                System.out.println("UID: " + authenticatedUser.getUid()); // 打印正確的 UID
+
+                // 根據 UID 判斷進入哪個界面
+                if (authenticatedUser.getUid() == 0) {
+                    MainSystemuiAdmin mainSystemuiAdmin = new MainSystemuiAdmin();
+                    mainSystemuiAdmin.setVisible(true);
+                } else {
+                    MainSystemuiUser mainSystemuiUser = new MainSystemuiUser();
+                    mainSystemuiUser.setVisible(true);
                 }
-            }
 
-            if (!isAuthenticated) {
-                System.out.println("Login Fail");
-                userText.setText("");
+                this.setVisible(false); // 隱藏登入界面
+            } else {
+                // 登入失敗，清空相關資料
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Login failed. Please check your username and password.",
+                    "Login Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+                System.out.println("Login failed. No matching user found.");
+                userText.setText("");       // 清空輸入框
                 passwordText.setText("");
             }
         });
         registerButton.addActionListener((ActionEvent e) -> {
             Registerui registerui = new Registerui();
             registerui.setVisible(true);
-        });
+            // this.setVisible(false);
+        });    
     }
+
     // 從 CSV 文件載入使用者
     private List<User> loadUserFromCsv(String path) {
         List<User> allUsers = new ArrayList<>();
@@ -108,13 +117,22 @@ public class Loginui extends JFrame {
                     isFirstLine = false;
                     continue;
                 }
-                allUsers.add(User.fromCsvRow(line));
+                try {
+                    User user = User.fromCsvRow(line);
+                    if (user != null) {
+                        allUsers.add(user);
+                    }
+                } catch (Exception e) {
+                    // 如果某行解析失敗，顯示錯誤訊息並跳過
+                    System.err.println("Failed to parse line: " + line);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
         return allUsers;
     }
+
     public static void main(String[] args) {
         new Loginui().setVisible(true);
     }
