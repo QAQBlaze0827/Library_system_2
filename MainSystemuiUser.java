@@ -132,6 +132,28 @@ public class MainSystemuiUser extends JFrame {
         //監控 控制右邊panel 的按鈕
         searchBookButton.addActionListener((e) -> {cardLayout.show(contentPanel, "SearchBook");});
         borrowBookButton.addActionListener((e) -> {cardLayout.show(contentPanel, "BorrowBook");});
+        logoutButton.addActionListener((e) -> {
+            // 顯示確認對話框
+            int result = JOptionPane.showConfirmDialog(
+                null, 
+                "Are you sure you want to log out?", 
+                "Logout Confirmation", 
+                JOptionPane.YES_NO_OPTION
+            );
+        
+            // 檢查使用者的選擇
+            if (result == JOptionPane.YES_OPTION) {
+                // 如果使用者按下 "Yes"，執行登出操作
+                JOptionPane.showMessageDialog(null, "You have logged out successfully.");
+                 // 創建並顯示 LoginUI 界面
+                new Loginui().setVisible(true);
+                // 關閉當前視窗
+                ((JFrame) SwingUtilities.getWindowAncestor(logoutButton)).dispose();
+            } else {
+                // // 如果使用者按下 "No"，不執行任何操作
+                // System.out.println("Logout cancelled.");
+            }
+        });
         //監控 控制右邊panel 的按鈕 end
         //監控新增的按鈕
         searchBook.addActionListener((e) ->{
