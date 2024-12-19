@@ -1,8 +1,15 @@
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.*;
 
 
 public class MainSystemuiUser extends JFrame {
+    private final String username;
     private Container cp;
     private CardLayout cardLayout;
     private final JPanel userPanel= new JPanel();
@@ -10,10 +17,11 @@ public class MainSystemuiUser extends JFrame {
     private JPanel contentPanel;
 
 
-    public MainSystemuiUser() {
+    public MainSystemuiUser(String username) {
+        this.username = username;
         init();
     }
-
+    
     private void init() {
         //初始化視窗
         this.setTitle("Library System");
@@ -30,7 +38,7 @@ public class MainSystemuiUser extends JFrame {
         cp.add(userPanel); 
         // User user = new User();
         
-        JLabel label = new JLabel("Welcome " );
+        JLabel label = new JLabel("Welcome " + username);
         label.setBounds(0, 0, 200, 30); 
         userPanel.setLayout(null);
         userPanel.add(label);
@@ -158,13 +166,13 @@ public class MainSystemuiUser extends JFrame {
         //監控新增的按鈕
         searchBook.addActionListener((e) ->{
             try {
-                // int book_ID = Integer.parseInt(searchBookIDText.getText());
-        
-                // 呼叫 Library 的 deleteBook 方法
-                // library.displayBooks();
-        
-                // 清空輸入框
+                //底下是測試用的
                 searchBookIDText.setText("");
+                String path = "allBook.csv";
+                List<Book> loadAllBooks = loadBooksFromFile(path);
+                for (Book book : loadAllBooks) {
+                    System.out.println(book.getBookName() + "," + book.getBookID() + "," + book.getIsBorrowed());
+                }
             } catch (NumberFormatException ex) {
                 System.out.println("Invalid Book ID. Please enter a numeric value.");
             }
@@ -185,7 +193,32 @@ public class MainSystemuiUser extends JFrame {
         //底下這不知道幹嘛的
         this.setResizable(true); // 確保視窗大小可以調整
     }
+    private List<Book> loadBooksFromFile(String path) {
+        List<Book> allBooks = new ArrayList<>();
+        File file = new File(path);
+    
+        if (!file.exists()) {
+            return allBooks; // 如果檔案不存在，返回空列表
+        }
+    
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                // 跳過標題行和無效行
+                if (!line.startsWith("BookName")) {
+                    Book book = Book.fromCsvRow(line);
+                    if (book != null) {
+                        allBooks.add(book);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    
+        return allBooks;
+    }
     public static void main(String[] args) {
-        new MainSystemuiUser().setVisible(true);
+
     }
 }

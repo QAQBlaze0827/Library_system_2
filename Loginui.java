@@ -81,7 +81,7 @@ public class Loginui extends JFrame {
                     MainSystemuiAdmin mainSystemuiAdmin = new MainSystemuiAdmin();
                     mainSystemuiAdmin.setVisible(true);
                 } else {
-                    MainSystemuiUser mainSystemuiUser = new MainSystemuiUser();
+                    MainSystemuiUser mainSystemuiUser = new MainSystemuiUser(authenticatedUser.getUname());
                     mainSystemuiUser.setVisible(true);
                 }
 
