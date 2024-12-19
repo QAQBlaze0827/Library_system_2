@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RemoveBook {
-    public static void main(String[] args) {
+    public void removefromlist(int bookid) {
         String path = "allBook.csv";
         List<Book> loadAllBooks = loadBookFromCsv(path);
 
@@ -13,7 +13,7 @@ public class RemoveBook {
             System.out.println(book.getBookName() + "," + book.getBookID() + "," + book.getIsBorrowed());
         }
 
-        int bookIdToDelete = 1234; // 要刪除的書本ID
+        int bookIdToDelete = bookid; // 要刪除的書本ID
         boolean bookIdIsDeleted = deleteBook(loadAllBooks, bookIdToDelete);
 
         if (bookIdIsDeleted) {
