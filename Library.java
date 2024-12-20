@@ -17,7 +17,36 @@ public class Library {
                 .findFirst()
                 .orElse(null);
     }
+    //將userid借的書籍加入到借書者的借書清單
+    public void borrowBookByUser(int userid, int bookID) {
+        String path = "allBook.csv";
+        List<Book> allBooks = Book.loadBooksFromFile(path);
 
+        // 查找目標書籍
+        for (Book book : allBooks) {
+            if (book.getBookID() == bookID) {
+                book.borrowBook(userid); // 借書
+                book.updateBookInCsv(path); // 更新到 CSV 文件
+                return;
+            }
+        }
+        System.out.println("Book not found!");
+    }
+    //將userid還的書籍從借書者的借書清單中刪除
+    public void returnBookByUser(int userid, int bookID) {
+        String path = "allBook.csv";
+        List<Book> allBooks = Book.loadBooksFromFile(path);
+
+        // 查找目標書籍
+        for (Book book : allBooks) {
+            if (book.getBookID() == bookID) {
+                book.returnBook(userid); // 還書
+                book.updateBookInCsv(path); // 更新到 CSV 文件
+                return;
+            }
+        }
+        System.out.println("Book not found!");
+    }
     // 獲取圖書館中的所有書籍
     public static List<Book> getLibraryBooks() {
         return new ArrayList<>(libraryBooks); // 返回副本，避免直接修改原始數據

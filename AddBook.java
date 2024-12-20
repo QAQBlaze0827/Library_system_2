@@ -8,7 +8,7 @@ public class AddBook {
         String path = "allBook.csv";
 
         // 加載現有書籍資料
-        List<Book> allBooks = loadBooksFromFile(path);
+        List<Book> allBooks = Book.loadBooksFromFile(path);
 
         // 新增書籍
         Book newBook = new Book(bookName, bookId, isBorrowed);
@@ -36,32 +36,32 @@ public class AddBook {
         }
     }
 
-    // 從文件中加載書籍資料
-    private List<Book> loadBooksFromFile(String path) {
-        List<Book> allBooks = new ArrayList<>();
-        File file = new File(path);
+    // // 從文件中加載書籍資料
+    // private List<Book> loadBooksFromFile(String path) {
+    //     List<Book> allBooks = new ArrayList<>();
+    //     File file = new File(path);
     
-        if (!file.exists()) {
-            return allBooks; // 如果檔案不存在，返回空列表
-        }
+    //     if (!file.exists()) {
+    //         return allBooks; // 如果檔案不存在，返回空列表
+    //     }
     
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                // 跳過標題行和無效行
-                if (!line.startsWith("BookName")) {
-                    Book book = Book.fromCsvRow(line);
-                    if (book != null) {
-                        allBooks.add(book);
-                    }
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    //     try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+    //         String line;
+    //         while ((line = br.readLine()) != null) {
+    //             // 跳過標題行和無效行
+    //             if (!line.startsWith("BookName")) {
+    //                 Book book = Book.fromCsvRow(line);
+    //                 if (book != null) {
+    //                     allBooks.add(book);
+    //                 }
+    //             }
+    //         }
+    //     } catch (IOException e) {
+    //         e.printStackTrace();
+    //     }
     
-        return allBooks;
-    }
+    //     return allBooks;
+    // }
     
     // 檢查檔案是否為空
     private static boolean isFileEmpty(String path) throws IOException {
@@ -74,3 +74,4 @@ public class AddBook {
         }
     }
 }
+

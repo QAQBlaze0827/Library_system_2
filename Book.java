@@ -1,3 +1,11 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 public class Book {
 
     private String bookName;
@@ -46,11 +54,41 @@ public class Book {
     public void setBorrowedByUid(Integer borrowedByUid){
         this.borrowedByUid = borrowedByUid;
     }
+    public static List<Book> loadBooksFromFile(String path) {
+        List<Book> allBooks = new ArrayList<>();
+        File file = new File(path);
+    
+        if (!file.exists()) {
+            return allBooks; // 如果檔案不存在，返回空列表
+        }
+    
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                // 跳過標題行和無效行
+                if (!line.startsWith("BookName")) {
+                    Book book = Book.fromCsvRow(line);
+                    if (book != null) {
+                        allBooks.add(book);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    
+        return allBooks;
+    }
+    
     public void borrowBook(int userid){
         if(!isBorrowed){
             this.isBorrowed = true;
             this.borrowedByUid=userid;
             System.out.println("Book is borrowed successfully");
+
+            // 更新 CSV 檔案
+            updateBookInCsv("allBook.csv");
+
            
         }
         else{
@@ -59,23 +97,52 @@ public class Book {
         }
         // this.isBorrowed = true;
     }
-    public void returnBook(){
+    public void returnBook(int userid){
         if(isBorrowed){
             this.isBorrowed = false;
             this.borrowedByUid = null;
             System.out.println("Book is returned successfully");
+            updateBookInCsv("allBook.csv");
         }
         else{
             System.out.println("Book is not borrowed");
         }
         // this.isBorrowed = false;
     }
-    //新增資料進檔案(改格式)
-    public String toCsvRow(){
-        
-        return bookName+","+bookID+","+isBorrowed+","+(borrowedByUid==null?"":borrowedByUid);
-
+    public  void updateBookInCsv(String path){
+        // String path = "allBook.csv";
+        List<Book> allBooks = loadBooksFromFile(path);
+    
+        // 更新內存中的書籍資料
+        for (Book book : allBooks) {
+            if (book.getBookID() == this.bookID) {
+                book.setBorrowed(true);
+                book.setBorrowedByUid(this.borrowedByUid);
+                break;
+            }
+        }
+    
+        // 將更新後的資料寫回到 CSV
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(path))) {
+            // 寫入標題行
+            bw.write("BookName,BookId,IsBorrowed,BorrowedByUid");
+            bw.newLine();
+    
+            // 寫入更新後的書籍資料
+            for (Book book : allBooks) {
+                bw.write(book.toCsvRow());
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+    
+    //新增資料進檔案(改格式)
+    public String toCsvRow() {
+        return bookName + "," + bookID + "," + isBorrowed + "," + (borrowedByUid == null ? "" : borrowedByUid);
+    }
+    
     //解析 CSV 文件中的行
     public static Book fromCsvRow(String csvRow) {
         if (csvRow == null || csvRow.trim().isEmpty()) {
