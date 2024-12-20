@@ -1,6 +1,1 @@
-BookName,BookId,IsBorrowed,borrowedID
-testdelete,1234,false,1
-java,88,false,1
-c++,99,false,1
-python,100,false,1
-C#,1,false,
+BookName,BookId,IsBorrowed,BorrowedByUid

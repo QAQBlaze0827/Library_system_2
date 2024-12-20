@@ -1,3 +1,4 @@
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +27,8 @@ public class Library {
         for (Book book : allBooks) {
             if (book.getBookID() == bookID) {
                 book.borrowBook(userid); // 借書
+                String dueDate = calculateDueDate(14);
+                book.setBorrowDate(dueDate);
                 book.updateBookInCsv(path); // 更新到 CSV 文件
                 return;
             }
@@ -46,6 +49,10 @@ public class Library {
             }
         }
         System.out.println("Book not found!");
+    }
+    private String calculateDueDate(int daysFromNow) {
+        LocalDate dueDate = LocalDate.now().plusDays(daysFromNow);
+        return dueDate.toString(); // 使用 yyyy-MM-dd 格式
     }
     // 獲取圖書館中的所有書籍
     public static List<Book> getLibraryBooks() {

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 public class Book {
@@ -12,6 +13,8 @@ public class Book {
     private int bookID;
     private boolean isBorrowed;
     private Integer borrowedByUid; // 借閱者的 UID
+    private String borrowdate;
+
 
     // public void addBook(String bookName, int bookID) {
     //     this.bookName = bookName;
@@ -22,7 +25,8 @@ public class Book {
         this.bookName = bookName;
         this.bookID = bookID;
         this.isBorrowed = isBorrowed;
-        this.borrowedByUid=null ; // 借閱者的 UID
+        this.borrowedByUid=-1 ; // 借閱者的 UID
+        this.borrowdate = "";
     }
     // public void deleteBook(int bookid){
     //     if (bookid == this.bookID){
@@ -48,11 +52,17 @@ public class Book {
     public int getBorrowedByUid(){
         return borrowedByUid;
     }
+    public String getBorrowdate(){
+        return borrowdate;
+    }
     public void setBorrowed(boolean isBorrowed){
         this.isBorrowed = isBorrowed;
     }
     public void setBorrowedByUid(Integer borrowedByUid){
         this.borrowedByUid = borrowedByUid;
+    }
+    public void setBorrowDate(String borrowdate){
+        this.borrowdate = borrowdate;
     }
     public static List<Book> loadBooksFromFile(String path) {
         List<Book> allBooks = new ArrayList<>();
@@ -84,6 +94,8 @@ public class Book {
         if(!isBorrowed){
             this.isBorrowed = true;
             this.borrowedByUid=userid;
+            this.borrowdate = LocalDate.now().toString(); // 设置借书日期
+            System.out.println(LocalDate.now().toString());
             System.out.println("Book is borrowed successfully");
 
             // 更新 CSV 檔案
@@ -98,9 +110,11 @@ public class Book {
         // this.isBorrowed = true;
     }
     public void returnBook(int userid){
-        if(isBorrowed){
+        if(isBorrowed == true){
+            
+            this.borrowedByUid = -1;
             this.isBorrowed = false;
-            this.borrowedByUid = null;
+            this.borrowdate = ""; // 清空借书日期
             System.out.println("Book is returned successfully");
             updateBookInCsv("allBook.csv");
         }
@@ -116,9 +130,19 @@ public class Book {
         // 更新內存中的書籍資料
         for (Book book : allBooks) {
             if (book.getBookID() == this.bookID) {
-                book.setBorrowed(true);
-                book.setBorrowedByUid(this.borrowedByUid);
-                break;
+                if(this.isBorrowed == false){
+                    book.setBorrowed(false)  ;
+                    book.setBorrowedByUid(this.borrowedByUid);
+                    
+                    break;
+                }
+                else{
+                    book.setBorrowed(true)  ;
+                    book.setBorrowedByUid(this.borrowedByUid);
+                    book.setBorrowDate(this.borrowdate);
+                    break;
+                }
+                
             }
         }
     
@@ -140,7 +164,7 @@ public class Book {
     
     //新增資料進檔案(改格式)
     public String toCsvRow() {
-        return bookName + "," + bookID + "," + isBorrowed + "," + (borrowedByUid == null ? "" : borrowedByUid);
+        return bookName + "," + bookID + "," + isBorrowed + "," + (borrowedByUid == null ? "" : borrowedByUid + "," + borrowdate);
     }
     
     //解析 CSV 文件中的行
@@ -151,7 +175,7 @@ public class Book {
         }
     
         String[] parts = csvRow.split(",");
-        if (parts.length < 3) { // 檢查是否有至少 3 個欄位
+        if (parts.length < 4) { // 檢查是否有至少 3 個欄位
             System.err.println("行格式錯誤，跳過：" + csvRow);
             return null;
         }
@@ -161,9 +185,11 @@ public class Book {
             int bookID = Integer.parseInt(parts[1]);
             boolean isBorrowed = Boolean.parseBoolean(parts[2]);
             Integer borrowedByUid = (parts.length > 3 && !parts[3].isEmpty()) ? Integer.parseInt(parts[3]) : null;
+            String borrowdate = parts.length > 4 ? parts[4] : ""; // 默认空字符串
     
             Book book = new Book(bookName, bookID, isBorrowed);
             book.setBorrowedByUid(borrowedByUid);
+            book.setBorrowDate(borrowdate);
             return book;
         } catch (NumberFormatException e) {
             System.err.println("行資料解析錯誤，跳過：" + csvRow);

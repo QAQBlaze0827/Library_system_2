@@ -1,5 +1,4 @@
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class AddBook {
@@ -20,7 +19,7 @@ public class AddBook {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(path, false))) {
             // 如果檔案不存在或為空，寫入標題
             if (!fileExists || isFileEmpty(path)) {
-                bw.write("BookName,BookId,IsBorrowed,BorrowedByUid");
+                bw.write("BookName,BookId,IsBorrowed,BorrowedByUid,BorrowDate");
                 bw.newLine();
             }
 

@@ -138,6 +138,7 @@ public class MainSystemuiUser extends JFrame {
             JOptionPane.showMessageDialog(this, "Error loading books: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
         //查詢書籍的panel中的元件 end
+
         //借閱書籍的panel
         JPanel borrowBookPanel = new JPanel();
         borrowBookPanel.setBounds(200, 0, 800, 750);
@@ -213,9 +214,9 @@ public class MainSystemuiUser extends JFrame {
         returnBookPanel.add(returnBook);
         // 創建表格模型
         // 创建表格数据模型
-        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+        DefaultTableModel tableModel_return = new DefaultTableModel(columnNames, 0);
         // 创建表格并添加到滚动面板
-        JTable bookTable = new JTable(tableModel);
+        JTable bookTable = new JTable(tableModel_return);
         JScrollPane scrollPane = new JScrollPane(bookTable);
         returnBookPanel.add(scrollPane, BorderLayout.CENTER);
         scrollPane.setBounds(10, 120, 780, 500);
@@ -226,7 +227,7 @@ public class MainSystemuiUser extends JFrame {
             List<Book> allBooks = loadBooksFromFile(path);
             for (Book book : allBooks) {
                 if((book.getBorrowedByUid() == uid) && (book.getIsBorrowed() == true)){
-                    tableModel.addRow(new Object[]{
+                    tableModel_return.addRow(new Object[]{
                         book.getBookID(),
                         book.getBookName(),
                         book.getIsBorrowed() ? "Yes" : "No"
@@ -250,14 +251,40 @@ public class MainSystemuiUser extends JFrame {
         borrowRecordTitle.setBounds(10, 10, 200, 25);
         borrowRecordTitle.setAlignmentX(CENTER_ALIGNMENT);
         borrowRecordPanel.add(borrowRecordTitle);
-
+        String[] columnNames_record = {"Book ID", "Book Name", "Is Borrowed", "Date"};
+        DefaultTableModel tableModel_returnRecord = new DefaultTableModel(columnNames_record, 0);
+        // 创建表格并添加到滚动面板
+        JTable bookTable_returnRecord = new JTable(tableModel_returnRecord);
+        JScrollPane scrollPane_returnRecord = new JScrollPane(bookTable_returnRecord);
+        borrowRecordPanel.add(scrollPane_returnRecord, BorderLayout.CENTER);
+        scrollPane_returnRecord.setBounds(10, 120, 780, 500);
+        refreshTable_borrowRecord(tableModel_returnRecord, "allBook.csv");
+        // 加载书籍数据并填充表格
+        //這邊我設想是 只顯示使用者借的書 畢竟是要還書 不可能還自己沒借的書
+        // try {
+        //     String path = "allBook.csv";
+        //     List<Book> allBooks = loadBooksFromFile(path);
+        //     for (Book book : allBooks) {
+        //         if((book.getBorrowedByUid() == uid) && (book.getIsBorrowed() == true)){
+        //             tableModel_return.addRow(new Object[]{
+        //                 book.getBookID(),
+        //                 book.getBookName(),
+        //                 book.getIsBorrowed() ? "Yes" : "No",
+        //                 book.getBorrowdate()
+        //             });
+        //         }
+        //     }
+        // } catch (Exception e) {
+        //     e.printStackTrace();
+        // }
         //------------------右邊的panel end
 
         
         //監控 控制右邊panel 的按鈕
         searchBookButton.addActionListener((e) -> {cardLayout.show(contentPanel, "SearchBook");});
         borrowBookButton.addActionListener((e) -> {cardLayout.show(contentPanel, "BorrowBook");refreshTable_borrow(tableModel_borrow, "allBook.csv");});
-        returnBookButton.addActionListener((e) -> {cardLayout.show(contentPanel, "ReturnBook");});
+        returnBookButton.addActionListener((e) -> {cardLayout.show(contentPanel, "ReturnBook");refreshTable_return(tableModel_return, "allBook.csv");});
+        borrowRecordButton.addActionListener((e) -> {cardLayout.show(contentPanel, "BorrowRecord");refreshTable_borrowRecord(tableModel_returnRecord, "allBook.csv");});
         logoutButton.addActionListener((e) -> {
             // 顯示確認對話框
             int result = JOptionPane.showConfirmDialog(
@@ -310,9 +337,26 @@ public class MainSystemuiUser extends JFrame {
                 JOptionPane.showMessageDialog(this, "Error occurred while searching: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
+        //借書的監控
         borrowBook.addActionListener((e) ->{
             try {
+                int bookID = Integer.parseInt(borrowBookIDText.getText().trim());
+                Library library = new Library();
+                library.borrowBookByUser(uid, bookID);
                 borrowBookIDText.setText("");
+                refreshTable_borrow(tableModel_borrow, "allBook.csv");
+            } catch (NumberFormatException ex) {
+                System.out.println("Invalid Book ID. Please enter a numeric value.");
+            }
+        });
+        //還書的監控
+        returnBook.addActionListener((e)->{
+            try {
+                int bookID = Integer.parseInt(returnBookIDText.getText().trim());
+                Library library = new Library();
+                library.returnBookByUser(uid, bookID);
+                returnBookIDText.setText("");
+                refreshTable_return(tableModel_return, "allBook.csv");
             } catch (NumberFormatException ex) {
                 System.out.println("Invalid Book ID. Please enter a numeric value.");
             }
@@ -359,7 +403,7 @@ public class MainSystemuiUser extends JFrame {
     }
     private void refreshTable_borrow(DefaultTableModel tableModel, String filePath) {
         tableModel.setRowCount(0); // 清空表格
-        System.err.println("refreshTable_borrow");
+        // System.err.println("refreshTable_borrow");
         try {
             List<Book> allBooks = loadBooksFromFile(filePath); // 重新加載數據
             for (Book book : allBooks) {
@@ -373,6 +417,42 @@ public class MainSystemuiUser extends JFrame {
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error loading books: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    private void refreshTable_return(DefaultTableModel tableModel, String filePath) {
+        tableModel.setRowCount(0); // 清空表格
+        // System.err.println("refreshTable_borrow");
+        try {
+            List<Book> allBooks = loadBooksFromFile(filePath); // 重新加載數據
+            for (Book book : allBooks) {
+                if((book.getBorrowedByUid() == uid) && (book.getIsBorrowed() == true)){
+                    tableModel.addRow(new Object[]{
+                        book.getBookID(),
+                        book.getBookName(),
+                        book.getIsBorrowed() ? "Yes" : "No"
+                    });
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error loading books: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    private void refreshTable_borrowRecord(DefaultTableModel tableModel, String filePath) {
+        tableModel.setRowCount(0); // 清空表格
+        try {
+            List<Book> allBooks = loadBooksFromFile(filePath); // 重新加載數據
+            for (Book book : allBooks) {
+                if (book.getBorrowedByUid() == uid && book.getIsBorrowed()) {
+                    tableModel.addRow(new Object[]{
+                        book.getBookID(),
+                        book.getBookName(),
+                        book.getIsBorrowed() ? "Yes" : "No",
+                        book.getBorrowdate() // 加入歸還日期
+                    });
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error loading borrow records: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
     public static void main(String[] args) {
