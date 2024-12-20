@@ -80,6 +80,9 @@ public class MainSystemuiUser extends JFrame {
         functionPanel.add(logoutButton);
         //-----------------功能 panel end
 
+
+
+
         //------------------右邊的panel
         cardLayout = new CardLayout();
         contentPanel = new JPanel(cardLayout);
@@ -109,7 +112,31 @@ public class MainSystemuiUser extends JFrame {
         searchBook.setBounds(10, 80, 200, 25);
         searchBook.setAlignmentX(LEFT_ALIGNMENT);
         searchBookPanel.add(searchBook);
-        
+        // 创建表格数据模型
+        String[] columnNames = {"Book ID", "Book Name", "Is Borrowed"};
+        DefaultTableModel tableModel_search = new DefaultTableModel(columnNames, 0);
+        // 创建表格并添加到滚动面板
+        JTable bookTable_search = new JTable(tableModel_search);
+        JScrollPane scrollPane_search = new JScrollPane(bookTable_search);
+        searchBookPanel.add(scrollPane_search, BorderLayout.CENTER);
+        scrollPane_search.setBounds(10, 120, 780, 500);
+        // 加载书籍数据并填充表格
+        //這邊我設想是 只顯示未被借走的書
+        try {
+            String path = "allBook.csv";
+            List<Book> allBooks = loadBooksFromFile(path);
+            for (Book book : allBooks) {
+                if(searchBookIDText.getText().equals(book.getBookID())){
+                    tableModel_search.addRow(new Object[]{
+                        book.getBookID(),
+                        book.getBookName(),
+                        book.getIsBorrowed() ? "Yes" : "No"
+                    });
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error loading books: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
         //查詢書籍的panel中的元件 end
         //借閱書籍的panel
         JPanel borrowBookPanel = new JPanel();
@@ -135,8 +162,8 @@ public class MainSystemuiUser extends JFrame {
         borrowBook.setAlignmentX(LEFT_ALIGNMENT);
         borrowBookPanel.add(borrowBook);
         // 创建表格数据模型
-        String[] columnNames_borrow = {"Book ID", "Book Name", "Is Borrowed"};
-        DefaultTableModel tableModel_borrow = new DefaultTableModel(columnNames_borrow, 0);
+        // String[] columnNames_search = {"Book ID", "Book Name", "Is Borrowed"};
+        DefaultTableModel tableModel_borrow = new DefaultTableModel(columnNames, 0);
         // 创建表格并添加到滚动面板
         JTable bookTable_borrow = new JTable(tableModel_borrow);
         JScrollPane scrollPane_borrow = new JScrollPane(bookTable_borrow);
@@ -186,7 +213,6 @@ public class MainSystemuiUser extends JFrame {
         returnBookPanel.add(returnBook);
         // 創建表格模型
         // 创建表格数据模型
-        String[] columnNames = {"Book ID", "Book Name", "Is Borrowed"};
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
         // 创建表格并添加到滚动面板
         JTable bookTable = new JTable(tableModel);
@@ -210,19 +236,6 @@ public class MainSystemuiUser extends JFrame {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        // 添加底部交互部分
-        // JPanel bottomPanel = new JPanel(new FlowLayout());
-        // returnBookPanel.add(bottomPanel, BorderLayout.SOUTH);
-
-        // JLabel returnBookID = new JLabel("Book ID:");
-        // JTextField returnBookIDText = new JTextField(10);
-        // JButton returnBookButton = new JButton("Return Book");
-
-        // bottomPanel.add(returnBookID);
-        // bottomPanel.add(returnBookIDText);
-        // bottomPanel.add(returnBookButton);
-        //還書的panel中的元件 end
         //------------------右邊的panel end
 
         
@@ -254,18 +267,32 @@ public class MainSystemuiUser extends JFrame {
         });
         //監控 控制右邊panel 的按鈕 end
         //監控新增的按鈕
-        searchBook.addActionListener((e) ->{
+        searchBook.addActionListener((e) -> {
+            String keyword = searchBookIDText.getText().trim(); // 使用者輸入的書名
+            if (keyword.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please enter a book name or part of it.", "Input Error", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+        
             try {
-                //底下是測試用的
-                searchBookIDText.setText("");
                 String path = "allBook.csv";
-                
-                List<Book> loadAllBooks = loadBooksFromFile(path);
-                for (Book book : loadAllBooks) {
-                    System.out.println(book.getBookName() + "," + book.getBookID() + "," + book.getIsBorrowed());
+                List<Book> allBooks = loadBooksFromFile(path); // 加載所有書籍
+                List<Book> filteredBooks = searchBooksByName(keyword, allBooks); // 搜索相關書籍
+        
+                tableModel_search.setRowCount(0); // 清空表格內容
+                for (Book book : filteredBooks) {
+                    tableModel_search.addRow(new Object[]{
+                        book.getBookID(),
+                        book.getBookName(),
+                        book.getIsBorrowed() ? "Yes" : "No"
+                    });
                 }
-            } catch (NumberFormatException ex) {
-                System.out.println("Invalid Book ID. Please enter a numeric value.");
+        
+                if (filteredBooks.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "No books found matching your search criteria.", "No Results", JOptionPane.INFORMATION_MESSAGE);
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error occurred while searching: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
         borrowBook.addActionListener((e) ->{
@@ -278,6 +305,7 @@ public class MainSystemuiUser extends JFrame {
         //底下這不知道幹嘛的
         this.setResizable(true); // 確保視窗大小可以調整
     }
+    //從csv檔載入書籍
     private List<Book> loadBooksFromFile(String path) {
         List<Book> allBooks = new ArrayList<>();
         File file = new File(path);
@@ -303,6 +331,18 @@ public class MainSystemuiUser extends JFrame {
     
         return allBooks;
     }
+    //從csv檔載入書籍 end
+    //搜尋書籍
+    private List<Book> searchBooksByName(String keyword, List<Book> allBooks) {
+        List<Book> filteredBooks = new ArrayList<>();
+        for (Book book : allBooks) {
+            if (book.getBookName().toLowerCase().contains(keyword.toLowerCase())) {
+                filteredBooks.add(book);
+            }
+        }
+        return filteredBooks;
+    }
+    
     public static void main(String[] args) {
 
     }
