@@ -1,4 +1,4 @@
 BookName,BookId,IsBorrowed,BorrowedByUid
-test,456,false,0
-java,88,false,0
 testifborrowed,123,true,2
+testdelete,1234,false,
+java,88,false,

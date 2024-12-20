@@ -1,5 +1,12 @@
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 
 public class MainSystemuiAdmin extends JFrame {
@@ -142,6 +149,28 @@ public class MainSystemuiAdmin extends JFrame {
         deleteBook.setBounds(10, 80, 200, 25);
         deleteBook.setAlignmentX(LEFT_ALIGNMENT);
         deleteBookPanel.add(deleteBook);
+        String[] columnNames = {"Book ID", "Book Name", "Is Borrowed"};
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+        // 创建表格并添加到滚动面板
+        JTable bookTable = new JTable(tableModel);
+        JScrollPane scrollPane = new JScrollPane(bookTable);
+        deleteBookPanel.add(scrollPane, BorderLayout.CENTER);
+        scrollPane.setBounds(10, 120, 780, 500);
+        // 加载书籍数据并填充表格
+
+        try {
+            String path = "allBook.csv";
+            List<Book> allBooks = loadBooksFromFile(path);
+            for (Book book : allBooks) {
+                tableModel.addRow(new Object[]{
+                    book.getBookID(),
+                    book.getBookName(),
+                    book.getIsBorrowed() ? "Yes" : "No"
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         //刪除書籍的panel中的元件 end
         //------------------
         //查詢書籍的panel
@@ -157,7 +186,7 @@ public class MainSystemuiAdmin extends JFrame {
         searchTitle.setBounds(10, 10, 200, 25);
         searchTitle.setAlignmentX(CENTER_ALIGNMENT);
         searchBookPanel.add(searchTitle);
-        JLabel searchBookID = new JLabel("Book ID");
+        JLabel searchBookID = new JLabel("Book Name");
         searchBookID.setBounds(10, 50, 80, 25);
         searchBookPanel.add(searchBookID);
         JTextField searchBookIDText = new JTextField(20);
@@ -167,6 +196,30 @@ public class MainSystemuiAdmin extends JFrame {
         searchBook.setBounds(10, 80, 200, 25);
         searchBook.setAlignmentX(LEFT_ALIGNMENT);
         searchBookPanel.add(searchBook);
+        // String[] columnNames = {"Book ID", "Book Name", "Is Borrowed"};
+        DefaultTableModel tableModel_search = new DefaultTableModel(columnNames, 0);
+        // 创建表格并添加到滚动面板
+        JTable bookTable_search = new JTable(tableModel_search);
+        JScrollPane scrollPane_search = new JScrollPane(bookTable_search);
+        searchBookPanel.add(scrollPane_search, BorderLayout.CENTER);
+        scrollPane_search.setBounds(10, 120, 780, 500);
+        // 加载书籍数据并填充表格
+        //這邊我設想是 只顯示未被借走的書
+        try {
+            String path = "allBook.csv";
+            List<Book> allBooks = loadBooksFromFile(path);
+            for (Book book : allBooks) {
+                if(searchBookIDText.getText().equals(book.getBookID())){
+                    tableModel_search.addRow(new Object[]{
+                        book.getBookID(),
+                        book.getBookName(),
+                        book.getIsBorrowed() ? "Yes" : "No"
+                    });
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error loading books: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
         //查詢書籍的panel中的元件 end
 
         //------------------
@@ -215,6 +268,7 @@ public class MainSystemuiAdmin extends JFrame {
                 // Library.addBook(newBook);
                 //到這邊
                 System.out.println("Book added: Name = " + bookName + ", ID = " + book_ID);
+                refreshTable(tableModel, "allBook.csv");
         
                 // 清空輸入框
                 bookNameText.setText("");
@@ -227,33 +281,101 @@ public class MainSystemuiAdmin extends JFrame {
         deleteBook.addActionListener((e) -> {
             try {
                 int book_ID = Integer.parseInt(deleteBookIDText.getText());
-                RemoveBook removebook = new RemoveBook();
-                removebook.removefromlist(book_ID);
-                // 呼叫 Library 的 deleteBook 方法
-                // library.deleteBook(book_ID);
+                RemoveBook removeBook = new RemoveBook();
+                removeBook.removefromlist(book_ID); // 假設此方法已成功刪除書籍
         
                 // 清空輸入框
                 deleteBookIDText.setText("");
+        
+                // 立即更新表格
+                refreshTable(tableModel, "allBook.csv");
+        
             } catch (NumberFormatException ex) {
-                System.out.println("Invalid Book ID. Please enter a numeric value.");
+                JOptionPane.showMessageDialog(this, "Invalid Book ID. Please enter a numeric value.", "Input Error", JOptionPane.ERROR_MESSAGE);
             }
         });
-        searchBook.addActionListener((e) ->{
+        searchBook.addActionListener((e) -> {
+            String keyword = searchBookIDText.getText().trim(); // 使用者輸入的書名
+            if (keyword.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please enter a book name or part of it.", "Input Error", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+        
             try {
-                // int book_ID = Integer.parseInt(searchBookIDText.getText());
+                String path = "allBook.csv";
+                List<Book> allBooks = loadBooksFromFile(path); // 加載所有書籍
+                List<Book> filteredBooks = searchBooksByName(keyword, allBooks); // 搜索相關書籍
         
-                // 呼叫 Library 的 deleteBook 方法
-                // library.displayBooks();
+                tableModel_search.setRowCount(0); // 清空表格內容
+                for (Book book : filteredBooks) {
+                    tableModel_search.addRow(new Object[]{
+                        book.getBookID(),
+                        book.getBookName(),
+                        book.getIsBorrowed() ? "Yes" : "No"
+                    });
+                }
         
-                // 清空輸入框
-                searchBookIDText.setText("");
-            } catch (NumberFormatException ex) {
-                System.out.println("Invalid Book ID. Please enter a numeric value.");
+                if (filteredBooks.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "No books found matching your search criteria.", "No Results", JOptionPane.INFORMATION_MESSAGE);
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error occurred while searching: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
         //底下這不知道幹嘛的
         this.setResizable(false); // 確保視窗大小可以調整
     }
+    private List<Book> loadBooksFromFile(String path) {
+        List<Book> allBooks = new ArrayList<>();
+        File file = new File(path);
+    
+        if (!file.exists()) {
+            return allBooks; // 如果檔案不存在，返回空列表
+        }
+    
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                // 跳過標題行和無效行
+                if (!line.startsWith("BookName")) {
+                    Book book = Book.fromCsvRow(line);
+                    if (book != null) {
+                        allBooks.add(book);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    
+        return allBooks;
+    }
+    private List<Book> searchBooksByName(String keyword, List<Book> allBooks) {
+        List<Book> filteredBooks = new ArrayList<>();
+        for (Book book : allBooks) {
+            if (book.getBookName().toLowerCase().contains(keyword.toLowerCase())) {
+                filteredBooks.add(book);
+            }
+        }
+        return filteredBooks;
+    }
+    //刷新表格
+    private void refreshTable(DefaultTableModel tableModel, String filePath) {
+        tableModel.setRowCount(0); // 清空表格
+        try {
+            List<Book> allBooks = loadBooksFromFile(filePath); // 重新加載數據
+            for (Book book : allBooks) {
+                tableModel.addRow(new Object[]{
+                    book.getBookID(),
+                    book.getBookName(),
+                    book.getIsBorrowed() ? "Yes" : "No"
+                });
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error loading books: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
     public static void main(String[] args) {
         new MainSystemuiAdmin().setVisible(true);
     }

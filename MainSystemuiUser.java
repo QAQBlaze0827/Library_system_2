@@ -121,12 +121,12 @@ public class MainSystemuiUser extends JFrame {
         searchBookPanel.add(scrollPane_search, BorderLayout.CENTER);
         scrollPane_search.setBounds(10, 120, 780, 500);
         // 加载书籍数据并填充表格
-        //這邊我設想是 只顯示未被借走的書
+        //搜尋
         try {
             String path = "allBook.csv";
             List<Book> allBooks = loadBooksFromFile(path);
             for (Book book : allBooks) {
-                if(searchBookIDText.getText().equals(book.getBookID())){
+                if(searchBookIDText.getText().equals(book.getBookID())){ //這邊或許 有更好的方法
                     tableModel_search.addRow(new Object[]{
                         book.getBookID(),
                         book.getBookName(),
