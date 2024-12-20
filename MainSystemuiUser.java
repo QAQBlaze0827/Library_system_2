@@ -11,6 +11,7 @@ import javax.swing.table.DefaultTableModel;
 
 public class MainSystemuiUser extends JFrame {
     private final String username;
+    private final int uid;
     private Container cp;
     private CardLayout cardLayout;
     private final JPanel userPanel= new JPanel();
@@ -18,15 +19,16 @@ public class MainSystemuiUser extends JFrame {
     private JPanel contentPanel;
 
 
-    public MainSystemuiUser(String username) {
+    public MainSystemuiUser(String username , int uid) {
         this.username = username;
+        this.uid = uid;
         init();
     }
     
     private void init() {
         //初始化視窗
         this.setTitle("Library System");
-        this.setSize(1000, 750); // 設定初始大小
+        this.setSize(1015, 750); // 設定初始大小
         this.setLocation(500, 200); // 設定視窗初始位置
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         cp = this.getContentPane(); 
@@ -132,6 +134,31 @@ public class MainSystemuiUser extends JFrame {
         borrowBook.setBounds(10, 80, 200, 25);
         borrowBook.setAlignmentX(LEFT_ALIGNMENT);
         borrowBookPanel.add(borrowBook);
+        // 创建表格数据模型
+        String[] columnNames_borrow = {"Book ID", "Book Name", "Is Borrowed"};
+        DefaultTableModel tableModel_borrow = new DefaultTableModel(columnNames_borrow, 0);
+        // 创建表格并添加到滚动面板
+        JTable bookTable_borrow = new JTable(tableModel_borrow);
+        JScrollPane scrollPane_borrow = new JScrollPane(bookTable_borrow);
+        borrowBookPanel.add(scrollPane_borrow, BorderLayout.CENTER);
+        scrollPane_borrow.setBounds(10, 120, 780, 500);
+        // 加载书籍数据并填充表格
+        //這邊我設想是 只顯示未被借走的書
+        try {
+            String path = "allBook.csv";
+            List<Book> allBooks = loadBooksFromFile(path);
+            for (Book book : allBooks) {
+                if(book.getIsBorrowed() == false){
+                    tableModel_borrow.addRow(new Object[]{
+                        book.getBookID(),
+                        book.getBookName(),
+                        book.getIsBorrowed() ? "Yes" : "No"
+                    });
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         //借閱書籍的panel中的元件 end
         //------------------
         //還書的panel
@@ -172,11 +199,13 @@ public class MainSystemuiUser extends JFrame {
             String path = "allBook.csv";
             List<Book> allBooks = loadBooksFromFile(path);
             for (Book book : allBooks) {
-                tableModel.addRow(new Object[]{
-                    book.getBookID(),
-                    book.getBookName(),
-                    book.getIsBorrowed() ? "Yes" : "No"
-                });
+                if(book.getBorrowedByUid() == uid){
+                    tableModel.addRow(new Object[]{
+                        book.getBookID(),
+                        book.getBookName(),
+                        book.getIsBorrowed() ? "Yes" : "No"
+                    });
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

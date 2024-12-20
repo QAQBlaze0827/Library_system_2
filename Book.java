@@ -36,6 +36,10 @@ public class Book {
     public boolean getIsBorrowed(){
         return isBorrowed;
     }
+    //這邊我加的
+    public int getBorrowedByUid(){
+        return borrowedByUid;
+    }
     public void setBorrowed(boolean isBorrowed){
         this.isBorrowed = isBorrowed;
     }

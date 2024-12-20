@@ -17,7 +17,7 @@ public class MainSystemuiAdmin extends JFrame {
     private void init() {
         //初始化視窗
         this.setTitle("Library System");
-        this.setSize(1000, 750); // 設定初始大小
+        this.setSize(1015, 750); // 設定初始大小
         this.setLocation(500, 200); // 設定視窗初始位置
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         cp = this.getContentPane(); 
