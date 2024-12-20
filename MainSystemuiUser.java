@@ -102,7 +102,7 @@ public class MainSystemuiUser extends JFrame {
         searchTitle.setBounds(10, 10, 200, 25);
         searchTitle.setAlignmentX(CENTER_ALIGNMENT);
         searchBookPanel.add(searchTitle);
-        JLabel searchBookID = new JLabel("Book ID");
+        JLabel searchBookID = new JLabel("Book Name");
         searchBookID.setBounds(10, 50, 80, 25);
         searchBookPanel.add(searchBookID);
         JTextField searchBookIDText = new JTextField(20);
