@@ -49,7 +49,7 @@ This compiles all the `.java` files in the directory.
 Run the program using the following command:
 
 ```bash
-java Mainui
+java Mainui.java
 ```
 
 This will start the main user interface of the application.
